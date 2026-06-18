@@ -24,6 +24,8 @@
         <lombok.version>1.18.36</lombok.version>
         <!-- Versão do plugin de compilação usada para configurar os annotation processors -->
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <!-- Evita erros de acesso a APIs internas do javac com Java 22+ -->
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
     <dependencies>
@@ -103,8 +105,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>17</release>
                     <annotationProcessorPaths>
                         <!-- Lombok PRIMEIRO: gera os métodos que o MapStruct vai usar -->
                         <path>

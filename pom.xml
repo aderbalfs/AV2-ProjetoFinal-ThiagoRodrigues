@@ -19,13 +19,8 @@
 
     <properties>
         <java.version>17</java.version>
-        <!-- Versão do MapStruct — deve ser compatível com Lombok -->
-        <mapstruct.version>1.6.3</mapstruct.version>
         <lombok.version>1.18.36</lombok.version>
-        <!-- Versão do plugin de compilação usada para configurar os annotation processors -->
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <!-- Evita erros de acesso a APIs internas do javac com Java 22+ -->
-        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
     <dependencies>
@@ -54,13 +49,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- MapStruct: geração de código de mapeamento entidade <-> DTO em tempo de compilação -->
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
-        </dependency>
-
         <!-- Lombok: reduz boilerplate (getters, setters, construtores, builders) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -83,7 +71,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <!-- Exclui Lombok do artefato final (é só para compilação) -->
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -94,11 +81,9 @@
             </plugin>
 
             <!--
-                IMPORTANTE: O maven-compiler-plugin deve ser configurado com AMBOS os
-                annotation processors (Lombok e MapStruct) na ordem correta:
-                1. Lombok processa primeiro (gera getters/setters/construtores)
-                2. MapStruct processa depois (usa os métodos gerados pelo Lombok)
-                Sem essa ordem, o MapStruct não consegue enxergar os métodos Lombok.
+                Lombok como único annotation processor — gera getters/setters/construtores
+                das entidades JPA. MapStruct foi substituído por implementação manual
+                nos mappers para garantir compatibilidade com qualquer versão do JDK.
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -107,23 +92,12 @@
                 <configuration>
                     <release>17</release>
                     <annotationProcessorPaths>
-                        <!-- Lombok PRIMEIRO: gera os métodos que o MapStruct vai usar -->
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
-                        <!-- MapStruct DEPOIS: usa os métodos gerados pelo Lombok -->
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
-                        </path>
                     </annotationProcessorPaths>
-                    <compilerArgs>
-                        <!-- Faz o MapStruct usar o modelo de componente Spring (beans gerenciados pelo IoC) -->
-                        <arg>-Amapstruct.defaultComponentModel=spring</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>
